@@ -1,3 +1,5 @@
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
 <!DOCTYPE html>
 <html lang="zxx">
 <head>
@@ -13,6 +15,8 @@
     <link rel="stylesheet" type="text/css" href="{{asset('assets/vendors/css/vendors.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('assets/vendors/css/daterangepicker.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/theme.min.css')}}" />
+    
+
     <!--[if lt IE 9]>
 			<script src="https:oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 			<script src="https:oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -46,8 +50,8 @@
                         </a>
                         <ul class="nxl-submenu">
                             <li class="nxl-item"><a class="nxl-link" href="{{url('manage_books')}}">All Books</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="reports-leads.html">Add Book</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="reports-project.html">Add Book Quantity</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{url('add_book')}}">Add Book</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{url('add_book_quantity')}}">Add Book Quantity</a></li>
                         </ul>
                     </li>
                     <li class="nxl-item nxl-hasmenu">
@@ -374,7 +378,103 @@
         </div>
     </footer>
 
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel"></h5>
+                <button type="button" class="close-btn btn btn-primary" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="successmessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="close-btn btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errortitle"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="errortitle"></h5>
+                <button type="button" class="close-btn btn btn-danger" data-dismiss="modal" aria-label="Close">
+                    <b><span aria-hidden="true">&times;</span></b>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="errormessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="close-btn btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_book_confirmation_model" tabindex="-1" role="dialog" aria-labelledby="errortitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="errortitle">Warning!</h5>
+                <button type="button" class="close-btn close btn-danger" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="errormessage">Do you really want to delete book : <b><span id="book_name"></span> </b>?</p> 
+                <p class="text-danger"><b>You will not be able to recover it again!</b></p>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="close-btn btn btn-secondary" data-dismiss="modal">Close</button>
+                <form name="book_delete_form" id="book_delete_form" method="POST" action="{{ url('delete_book_success') }}">
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" name="book_id_delete" id="book_id_delete">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <script>
+        $(".close-btn").click(function(){
+            $('#errorModal').modal('hide');
+            $('#successModal').modal('hide');
+            $("#delete_book_confirmation_model").modal("hide");
+        });
+
+        window.onload = function () {
+        var errortitle = "{{ session('errortitle') }}";
+        var errormessage = "{{ session('errormessage') }}";
+
+        if (errortitle && errormessage) {
+            $('#errortitle').text(errortitle);
+            $('#errormessage').text(errormessage);
+            $('#errorModal').modal('show');
+        }
+
+        // Check for success message in session
+        var successtitle = "{{ session('successtitle') }}";
+        var successmessage = "{{ session('successmessage') }}";
+
+        if (successtitle && successmessage) {
+            $('#successModalLabel').text(successtitle);
+            $('#successmessage').text(successmessage);
+            $('#successModal').modal('show');
+        }
+    };
+    </script>
     <script src="{{asset('assets/vendors/js/vendors.min.js')}}"></script>
     <script src="{{asset('assets/vendors/js/daterangepicker.min.js')}}"></script>
     <script src="{{asset('assets/vendors/js/apexcharts.min.js')}}"></script>
@@ -382,5 +482,6 @@
     <script src="{{asset('assets/js/common-init.min.js')}}"></script>
     <script src="{{asset('assets/js/dashboard-init.min.js')}}"></script>
     <script src="{{asset('assets/js/theme-customizer-init.min.js')}}"></script>
+    <script src="{{asset('assets/js/widgets-tables-init.min.js')}}"></script>
 </body>
 </html>
